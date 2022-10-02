@@ -58,9 +58,9 @@ router.post('/iniciarSesion', (req, res) => {
                 let data = JSON.stringify(rows[0]);
                 const token = jwt.sign(data, 'testsamuihelados');
                 res.status(200).json({"ok":true,
-                "resultado":token});
+                "resultado":[token]});
             } else {
-                res.status(401).json({"ok":false,
+                res.status(200).json({"ok":false,
                 "mensaje":"Usuario y/o contraseña incorrectos"});
             }
         } else {

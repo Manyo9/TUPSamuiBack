@@ -1,6 +1,6 @@
 Este repo es temporal y una vez que implementemos .env se debe volver a subir
 
-npm install
+npm install 
 npm run serve
 
 en la DB:
