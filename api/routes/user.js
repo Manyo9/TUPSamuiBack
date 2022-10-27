@@ -47,10 +47,7 @@ router.get('/:id', verifyToken,(req,res)=>{
 
 router.post('/iniciarSesion', (req, res) => {
     const {usuario, contrasenia} = req.body;
-    mysqlConnecction.query('SELECT u.id, r.nombre as rol,'+
-    ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u'+
-    ' join roles r on r.id = u.idRol'+
-    ' where u.usuario=? and u.contrasenia=?;',
+    mysqlConnecction.query('call spIniciarSesion(?,?)',
     [usuario, contrasenia],
     (err,rows,fields) => {
         if(!err){
@@ -72,9 +69,7 @@ router.post('/iniciarSesion', (req, res) => {
 
 router.post('/nuevoUsuarioSocio', (req, res) => {
     const {usuario, contrasenia} = req.body;
-    mysqlConnecction.query('INSERT INTO samuidb.usuarios'+
-    ' (idRol, usuario, contrasenia, fechaAlta) values'+
-    ' (1, ?, ?, NOW());',[usuario, contrasenia],
+    mysqlConnecction.query('call spNuevoUsuarioSocio(?, ?)',[usuario, contrasenia],
     (err,rows,fields) => {
         if(!err){
             res.status(201).json({"ok":true,
@@ -90,9 +85,7 @@ router.post('/nuevoUsuarioSocio', (req, res) => {
 router.post('/nuevoUsuarioAdmin', verifyToken, (req, res) => {
     if(req.data.rol === 'Admin'){
         const {usuario, contrasenia} = req.body;
-        mysqlConnecction.query('INSERT INTO samuidb.usuarios'+
-        ' (idRol, usuario, contrasenia, fechaAlta) values'+
-        ' (2, ?, ?, NOW());',[usuario, contrasenia],
+        mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)',[usuario, contrasenia],
         (err,rows,fields) => {
             if(!err){
                 res.status(201).json({"ok":true,
