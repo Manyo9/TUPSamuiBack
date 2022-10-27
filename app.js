@@ -12,4 +12,7 @@ app.use(cors());
 const userRoute = require('./api/routes/user');
 app.use('/usuarios',userRoute);
 
+const productRoute = require('./api/routes/product');
+app.use('/productos',productRoute);
+
 module.exports = app;
