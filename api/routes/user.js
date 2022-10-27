@@ -50,6 +50,7 @@ router.post('/iniciarSesion', (req, res) => {
     mysqlConnecction.query('call spIniciarSesion(?,?)',
     [usuario, contrasenia],
     (err,rows,fields) => {
+        rows=rows[0];
         if(!err){
             if(rows.length > 0){
                 let data = JSON.stringify(rows[0]);
