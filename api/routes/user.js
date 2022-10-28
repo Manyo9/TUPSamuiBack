@@ -102,16 +102,22 @@ router.post('/nuevoUsuarioAdmin', verifyToken, (req, res) => {
     }
 });
 
-function verifyToken(req, res, next){
-    if(!req.headers.authorization) return res.status(401).json({"ok":false,"mensaje":"No autorizado"});
+function verifyToken(req, res, next) {
+    if (!req.headers.authorization) return res.status(401).json({ "ok": false, "mensaje": "No autorizado" });
     let token = req.headers.authorization.split(' ')[1];
 
-    if(token === '' || token === null){
-        return res.status(401).json({"ok":false,"mensaje":"Token inválido"});
+    if (token === '' || token === null) {
+        return res.status(401).json({ "ok": false, "mensaje": "Token inválido" });
     }
-        let contenido = jwt.verify(token,'testsamuihelados'); // aprender como manejar si se pasa un token invalido
-        req.data = contenido;
-        next();
+    let contenido = jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+        if (err) {
+            return undefined;
+        } else {
+            return decoded;
+        }
+    });
+    req.data = contenido;
+    next();
 }
 
 module.exports = router;

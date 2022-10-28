@@ -5,6 +5,7 @@ const router = express.Router();
 const mysqlConnecction = require('../connection/connection');
 
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 
 router.get('/', (req, res) => {
@@ -105,7 +106,13 @@ function verifyToken(req, res, next) {
     if (token === '' || token === null) {
         return res.status(401).json({ "ok": false, "mensaje": "Token inválido" });
     }
-    let contenido = jwt.verify(token, 'testsamuihelados'); // aprender como manejar si se pasa un token invalido
+    let contenido = jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+        if (err) {
+            return undefined;
+        } else {
+            return decoded;
+        }
+    });
     req.data = contenido;
     next();
 }
