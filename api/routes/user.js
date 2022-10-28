@@ -1,12 +1,18 @@
 const express = require('express');
 const app = require('../../app');
 const router = express.Router();
+const authJwt = require('../middleware/authjwt');
 
 const mysqlConnecction = require('../connection/connection');
 
 const jwt = require('jsonwebtoken');
 
-router.get('/', verifyToken,(req,res)=>{
+router.get('/', authJwt.verifyToken,(req,res)=>{
+    if (!req.data) {
+        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
+        return;
+    }
+
     if(req.data.rol === 'Admin'){
         mysqlConnecction.query('select u.id, r.nombre as rol,'+
         ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u'+
@@ -24,7 +30,12 @@ router.get('/', verifyToken,(req,res)=>{
     }
 });
 
-router.get('/:id', verifyToken,(req,res)=>{
+router.get('/:id', authJwt.verifyToken,(req,res)=>{
+    if (!req.data) {
+        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
+        return;
+    }
+
     if(req.data.id == req.params['id'] || req.data.rol === 'Admin'){
         mysqlConnecction.query('select u.id, r.nombre as rol,'+
         ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u'+
@@ -83,7 +94,12 @@ router.post('/nuevoUsuarioSocio', (req, res) => {
     });
 });
 
-router.post('/nuevoUsuarioAdmin', verifyToken, (req, res) => {
+router.post('/nuevoUsuarioAdmin', authJwt.verifyToken, (req, res) => {
+    if (!req.data) {
+        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
+        return;
+    }
+    
     if(req.data.rol === 'Admin'){
         const {usuario, contrasenia} = req.body;
         mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)',[usuario, contrasenia],
@@ -101,23 +117,5 @@ router.post('/nuevoUsuarioAdmin', verifyToken, (req, res) => {
         res.status(403).json({"ok":false,"mensaje":"Usted no tiene los permisos requeridos para acceder a este recurso."});
     }
 });
-
-function verifyToken(req, res, next) {
-    if (!req.headers.authorization) return res.status(401).json({ "ok": false, "mensaje": "No autorizado" });
-    let token = req.headers.authorization.split(' ')[1];
-
-    if (token === '' || token === null) {
-        return res.status(401).json({ "ok": false, "mensaje": "Token inválido" });
-    }
-    let contenido = jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-        if (err) {
-            return undefined;
-        } else {
-            return decoded;
-        }
-    });
-    req.data = contenido;
-    next();
-}
 
 module.exports = router;
