@@ -54,7 +54,7 @@ router.post('/iniciarSesion', (req, res) => {
         if(!err){
             if(rows.length > 0){
                 let data = JSON.stringify(rows[0]);
-                const token = jwt.sign(data, 'testsamuihelados');
+                const token = jwt.sign(data, process.env.SECRET_KEY);
                 res.status(200).json({"ok":true,
                 "resultado":[token]});
             } else {
