@@ -1,11 +1,12 @@
 const mysql = require('mysql');
+require('dotenv').require();
 
 const mysqlConnecction = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Manyito123!',
-    database: 'samuidb',
-    port: '3306'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 })
 
 mysqlConnecction.connect(err => {
