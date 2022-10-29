@@ -115,5 +115,25 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
         })
 
 });
+router.get('/', authJwt.verifyToken,(req,res)=>{
+    if (!req.data) {
+        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
+        return;
+    }
 
+    if(req.data.rol === 'Admin' || req.data.rol === 'Empleado'){
+        mysqlConnecction.query('call spObtenerPedidos();',
+        (err,rows,fields) => {
+            if(!err){
+                res.status(200).json({"ok":true,"resultado":rows});
+                console.log(rows);
+            } else {
+                res.status(500).json({"ok":false,"mensaje":"Error al listar pedidos"})
+                console.log(err);
+            }
+        })
+    } else {
+        res.status(403).json({"ok":false,"mensaje":"Usted no tiene los permisos requeridos para acceder a este recurso."});
+    }
+});
 module.exports = router
