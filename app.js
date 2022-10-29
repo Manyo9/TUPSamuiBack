@@ -15,4 +15,7 @@ app.use('/usuarios',userRoute);
 const productRoute = require('./api/routes/product');
 app.use('/productos',productRoute);
 
+const orderRoute = require('./api/routes/order');
+app.use('/pedidos',orderRoute);
+
 module.exports = app;
