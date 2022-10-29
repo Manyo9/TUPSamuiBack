@@ -67,6 +67,11 @@ router.post('/', authJwt.verifyToken, async (req, res) => {
                 catch (e) {
                     console.error(e);
                     console.log("rollback");
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al registrar pedido"
+
+                    });
                     await mysqlConnecction.rollback();
                 }
 
@@ -136,4 +141,5 @@ router.get('/', authJwt.verifyToken,(req,res)=>{
         res.status(403).json({"ok":false,"mensaje":"Usted no tiene los permisos requeridos para acceder a este recurso."});
     }
 });
+
 module.exports = router

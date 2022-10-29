@@ -96,7 +96,7 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
         mysqlConnecction.query('call spBorrarProducto(?)', [req.params['id']],
             (err, rows, fields) => {
                 if (!err) {
-                    res.status(201).json({
+                    res.status(200).json({
                         "ok": true,
                         "mensaje": "Producto eliminado con éxito"
                     });
