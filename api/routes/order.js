@@ -22,7 +22,7 @@ router.post('/', authJwt.verifyToken, async (req, res) => {
         idPuntoVenta = 2;
         idSocio = req.data.idSocio;
         idEmpleado = null;
-    //Para empleados y admins el punto de venta es la sucursal y se manda un idEmpleado    
+        //Para empleados y admins el punto de venta es la sucursal y se manda un idEmpleado    
     } else if (req.data.rol === 'Admin' | req.data.rol === 'Empleado') {
         idPuntoVenta = 1;
         idEmpleado = req.data.idEmpleado;
@@ -83,5 +83,37 @@ router.post('/', authJwt.verifyToken, async (req, res) => {
         });
 });
 
+router.delete('/:id', authJwt.verifyToken, (req, res) => {
+    if (!req.data) {
+        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
+        return;
+    }
+    mysqlConnecction.query('select idSocio from pedidos where id = ?;', [req.params['id']],
+        (err, rows, fields) => {
+            const idSocio = rows[0].idSocio;
+
+            //   Puede cancelarlo la persona que hizo el pedido o un admin o un empleado
+            if ((req.data.idSocio && req.data.idSocio == idSocio) || req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
+                mysqlConnecction.query('call spCancelarPedido(?)', [req.params['id']],
+                    (err, rows, fields) => {
+                        if (!err) {
+                            res.status(201).json({
+                                "ok": true,
+                                "mensaje": "Pedido cancelado con éxito"
+                            });
+                        } else {
+                            console.log(err);
+                            res.status(500).json({
+                                "ok": false,
+                                "mensaje": "Error al cancelar pedido"
+                            });
+                        }
+                    });
+            } else {
+                res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+            }
+        })
+
+});
 
 module.exports = router
