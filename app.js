@@ -18,4 +18,7 @@ app.use('/productos',productRoute);
 const orderRoute = require('./api/routes/order');
 app.use('/pedidos',orderRoute);
 
+const flavourRoute = require('./api/routes/flavour');
+app.use('/sabores',flavourRoute);
+
 module.exports = app;
