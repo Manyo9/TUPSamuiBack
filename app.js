@@ -21,4 +21,7 @@ app.use('/pedidos',orderRoute);
 const flavourRoute = require('./api/routes/flavour');
 app.use('/sabores',flavourRoute);
 
+const memberRoute = require('./api/routes/member');
+app.use('/socios',memberRoute);
+
 module.exports = app;
