@@ -28,7 +28,7 @@ router.post('/', authJwt.verifyToken, (req, res) => {
     }
     if (req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
         const { nombre, activo } = req.body;
-        mysqlConnecction.query('call spInsertarProducto(?,?)', [nombre,activo],
+        mysqlConnecction.query('call spCrearGusto(?,?)', [nombre,activo],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
