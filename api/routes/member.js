@@ -18,8 +18,8 @@ router.get('/', authJwt.verifyToken, (req, res) => {
         mysqlConnecction.query('call spObtenerSocios();',
             (err, rows, fields) => {
                 if (!err) {
-                    res.status(200).json({ "ok": true, "resultado": rows });
-                    console.log(rows);
+                    res.status(200).json({ "ok": true, "resultado": rows[0]});
+                    console.log(rows[0]);
                 } else {
                     res.status(500).json({ "ok": false, "mensaje": "Error al listar socios" })
                     console.log(err);
@@ -31,10 +31,6 @@ router.get('/', authJwt.verifyToken, (req, res) => {
 
 });
 router.post('/', (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
     const { idUsuario, nombre, apellido, domicilio, email, dni, telefono } = req.body;
     mysqlConnecction.query('call spRegistrarSocio(?,?,?,?,?,?,?)', [idUsuario, nombre, apellido, domicilio, email, dni, telefono],
         (err, rows, fields) => {
@@ -61,7 +57,7 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
     }
     
     if (req.data.rol === 'Admin' || req.data.idSocio == req.params['id'] ) {
-        mysqlConnecction.query('call spDarDeBajaUsuario(?,@status); select @status as status;', [req.params['id']],
+        mysqlConnecction.query('call spDarDeBajaSocio(?,@status); select @status as status;', [req.params['id']],
             (err, rows, fields) => {
                 if (!err) {
                     const status = rows[1][0].status;
