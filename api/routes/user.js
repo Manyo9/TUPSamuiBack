@@ -174,7 +174,7 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
                     } else if (status == 0){
                         res.status(404).json({
                             "ok": false,
-                            "mensaje": "Error al eliminar producto"
+                            "mensaje": "Error al dar de baja usuario"
                         });
                     }
 
@@ -182,7 +182,7 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
                     console.log(err);
                     res.status(500).json({
                         "ok": false,
-                        "mensaje": "Error al eliminar producto"
+                        "mensaje": "Error al dar de baja usuario"
                     });
                 }
 
