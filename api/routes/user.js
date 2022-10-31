@@ -102,32 +102,24 @@ router.post('/nuevoUsuarioSocio', (req, res) => {
         });
 });
 
-router.post('/nuevoUsuarioAdmin', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
+router.post('/nuevoUsuarioAdmin', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isAdmin], (req, res) => {
 
-    if (req.data.rol === 'Admin') {
-        const { usuario, contrasenia } = req.body;
-        mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)', [usuario, contrasenia],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "mensaje": "Usuario creado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al crear usuario"
-                    });
-                }
-            });
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+    const { usuario, contrasenia } = req.body;
+    mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)', [usuario, contrasenia],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "mensaje": "Usuario creado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al crear usuario"
+                });
+            }
+        });
 });
 router.post('/nuevoUsuarioEmpleado', authJwt.verifyToken, (req, res) => {
     if (!req.data) {
@@ -171,7 +163,7 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
                             "ok": true,
                             "mensaje": "Usuario dado de baja con éxito"
                         });
-                    } else if (status == 0){
+                    } else if (status == 0) {
                         res.status(404).json({
                             "ok": false,
                             "mensaje": "Error al dar de baja usuario"

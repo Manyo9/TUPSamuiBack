@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 
-function verifyToken(req, res, next) {
+verifyToken = (req, res, next) => {
     if (!req.headers.authorization) return res.status(401).json({ "ok": false, "mensaje": "No autorizado" });
     let token = req.headers.authorization.split(' ')[1];
 
@@ -16,11 +16,48 @@ function verifyToken(req, res, next) {
         }
     });
     req.data = contenido;
-    next();
+    return next();
 }
+
+invalidTokenCheck = async (req, res, next) => {
+    if (!req.data) {
+        return res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
+    } else {
+        return next();
+    }
+};
+
+isAdmin = async (req, res, next) => {
+    if (req.data.rol === 'Admin'){
+        return next();
+    } else {
+        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+    }
+};
+
+isEmployee = async (req, res, next) => {
+    if (req.data.rol === 'Empleado' && req.data.rol === 'Admin'){
+        return next();
+    } else {
+        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+    }
+};
+
+checkIdSocio = async (req, res, next) => {
+    if (req.data.rol === 'Admin' || req.data.idSocio == req.params['id']){
+        return next();
+    } else {
+        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+    }
+};
+
 
 const authJwt = {
   verifyToken,
+  invalidTokenCheck,
+  isAdmin,
+  isEmployee,
+  checkIdSocio
 };
 
 module.exports = authJwt;
