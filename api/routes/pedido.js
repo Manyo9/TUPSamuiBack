@@ -126,5 +126,16 @@ router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmplo
             }
         })
 });
-
+router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
+    mysqlConnecction.query('call spObtenerDetalles(?);', [req.params['id']],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({ "ok": true, "resultado": rows[0] });
+                console.log(rows);
+            } else {
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar detalles de pedido" })
+                console.log(err);
+            }
+        })
+});
 module.exports = router
