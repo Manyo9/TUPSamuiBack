@@ -9,11 +9,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 
-router.post('/', authJwt.verifyToken, async (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
+router.post('/', [authJwt.verifyToken, authJwt.invalidTokenCheck], async (req, res) => {
     let idPuntoVenta;
     let idSocio;
     let idEmpleado;
@@ -88,11 +84,8 @@ router.post('/', authJwt.verifyToken, async (req, res) => {
         });
 });
 
-router.delete('/:id', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
+router.delete('/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
+
     mysqlConnecction.query('select idSocio from pedidos where id = ?;', [req.params['id']],
         (err, rows, fields) => {
             const idSocio = rows[0].idSocio;
@@ -120,26 +113,18 @@ router.delete('/:id', authJwt.verifyToken, (req, res) => {
         })
 
 });
-router.get('/', authJwt.verifyToken,(req,res)=>{
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
+router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], (req, res) => {
 
-    if(req.data.rol === 'Admin' || req.data.rol === 'Empleado'){
-        mysqlConnecction.query('call spObtenerPedidos();',
-        (err,rows,fields) => {
-            if(!err){
-                res.status(200).json({"ok":true,"resultado":rows[0]});
+    mysqlConnecction.query('call spObtenerPedidos();',
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({ "ok": true, "resultado": rows[0] });
                 console.log(rows);
             } else {
-                res.status(500).json({"ok":false,"mensaje":"Error al listar pedidos"})
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
                 console.log(err);
             }
         })
-    } else {
-        res.status(403).json({"ok":false,"mensaje":"Usted no tiene los permisos requeridos para acceder a este recurso."});
-    }
 });
 
 module.exports = router
