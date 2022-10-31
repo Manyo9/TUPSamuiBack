@@ -36,7 +36,7 @@ isAdmin = async (req, res, next) => {
 };
 
 isEmployee = async (req, res, next) => {
-    if (req.data.rol === 'Empleado' && req.data.rol === 'Admin'){
+    if (req.data.rol === 'Empleado' || req.data.rol === 'Admin'){
         return next();
     } else {
         res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
