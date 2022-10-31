@@ -9,19 +9,19 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // RUTAS
-const userRoute = require('./api/routes/user');
-app.use('/usuarios',userRoute);
+const usuarioRoute = require('./api/routes/usuario');
+app.use('/usuarios',usuarioRoute);
 
-const productRoute = require('./api/routes/product');
-app.use('/productos',productRoute);
+const productoRoute = require('./api/routes/producto');
+app.use('/productos',productoRoute);
 
-const orderRoute = require('./api/routes/order');
-app.use('/pedidos',orderRoute);
+const pedidoRoute = require('./api/routes/pedido');
+app.use('/pedidos',pedidoRoute);
 
-const flavourRoute = require('./api/routes/flavour');
-app.use('/sabores',flavourRoute);
+const gustoRoute = require('./api/routes/gusto');
+app.use('/sabores',gustoRoute);
 
-const memberRoute = require('./api/routes/member');
-app.use('/socios',memberRoute);
+const socioRoute = require('./api/routes/socio');
+app.use('/socios',socioRoute);
 
 module.exports = app;
