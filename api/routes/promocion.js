@@ -22,13 +22,13 @@ router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => 
         })
 });
 router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
-    mysqlConnecction.query('call spObtenerPromociones(?);', [req.params['id']],
+    mysqlConnecction.query('call spObtenerDetallesPromocion(?);', [req.params['id']],
         (err, rows, fields) => {
             if (!err) {
                 res.status(200).json({ "ok": true, "resultado": rows[0] });
                 console.log(rows);
             } else {
-                res.status(500).json({ "ok": false, "mensaje": "Error al listar promociones" })
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar detalles de promocion" })
                 console.log(err);
             }
         })
