@@ -169,4 +169,27 @@ router.get('/pendientes',
             }
         })
 });
+router.put('/estado',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee],
+    (req, res) => {
+
+        const { idEstado, idPedido } = req.body;
+        mysqlConnecction.query('call spActualizarEstadoPedido(?,?)', [idEstado,idPedido],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "mensaje": "Estado del pedido actualizado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al actualizar estado de pedido"
+                    });
+                }
+            });
+});
 module.exports = router
