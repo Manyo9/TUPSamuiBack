@@ -33,6 +33,19 @@ router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (r
             }
         })
 });
+router.get('/promociones/vigentes',  (req, res) => {
+    mysqlConnecction.query('call spObtenerPromocionesVigentes();',
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({ "ok": true, "resultado": rows[0] });
+                console.log(rows);
+            } else {
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar promociones vigentes" })
+                console.log(err);
+            }
+        })
+});
+
 router.post('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], async (req, res) => {
 
     const { nombre, descripcion, precioPuntos, detalles, fechaDesde, fechaHasta } = req.body;
