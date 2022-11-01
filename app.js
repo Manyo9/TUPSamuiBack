@@ -19,7 +19,7 @@ const pedidoRoute = require('./api/routes/pedido');
 app.use('/pedidos',pedidoRoute);
 
 const gustoRoute = require('./api/routes/gusto');
-app.use('/sabores',gustoRoute);
+app.use('/gustos',gustoRoute);
 
 const socioRoute = require('./api/routes/socio');
 app.use('/socios',socioRoute);
