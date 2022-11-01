@@ -7,53 +7,43 @@ const mysqlConnecction = require('../connection/connection');
 
 const jwt = require('jsonwebtoken');
 
-router.get('/', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
+router.get('/', 
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isAdmin] , (req, res) => {
 
-    if (req.data.rol === 'Admin') {
-        mysqlConnecction.query('select u.id, r.nombre as rol,' +
-            ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
-            ' join roles r on r.id = u.idRol;',
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(200).json({ "ok": true, "resultado": rows });
-                } else {
-                    res.status(500).json({ "ok": false, "mensaje": "Error al listar usuarios" })
-                    console.log(err);
-                }
-            })
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+    mysqlConnecction.query('select u.id, r.nombre as rol,' +
+        ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
+        ' join roles r on r.id = u.idRol;',
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({ "ok": true, "resultado": rows });
+            } else {
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar usuarios" })
+                console.log(err);
+            }
+        })
 });
 
-router.get('/:id', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
+router.get('/:id',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.checkIdUsuario], (req, res) => {
 
-    if (req.data.id == req.params['id'] || req.data.rol === 'Admin') {
-        mysqlConnecction.query('select u.id, r.nombre as rol,' +
-            ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
-            ' join roles r on r.id = u.idRol where u.id = ?;', [req.params['id']],
-            (err, rows, fields) => {
-                if (!err) {
-                    if (rows.length > 0) {
-                        res.status(200).json({ "ok": true, "resultado": rows });
-                    } else {
-                        res.status(404).json({ "ok": false, "resultado": [] });
-                    }
+    mysqlConnecction.query('select u.id, r.nombre as rol,' +
+        ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
+        ' join roles r on r.id = u.idRol where u.id = ?;', [req.params['id']],
+        (err, rows, fields) => {
+            if (!err) {
+                if (rows.length > 0) {
+                    res.status(200).json({ "ok": true, "resultado": rows });
                 } else {
-                    console.log(err);
+                    res.status(404).json({ "ok": false, "resultado": [] });
                 }
-            })
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+            } else {
+                console.log(err);
+            }
+    })
 });
 
 router.post('/iniciarSesion', (req, res) => {
@@ -102,7 +92,10 @@ router.post('/nuevoUsuarioSocio', (req, res) => {
         });
 });
 
-router.post('/nuevoUsuarioAdmin', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isAdmin], (req, res) => {
+router.post('/nuevoUsuarioAdmin',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isAdmin], (req, res) => {
 
     const { usuario, contrasenia } = req.body;
     mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)', [usuario, contrasenia],
@@ -121,66 +114,59 @@ router.post('/nuevoUsuarioAdmin', [authJwt.verifyToken, authJwt.invalidTokenChec
             }
         });
 });
-router.post('/nuevoUsuarioEmpleado', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
 
-    if (req.data.rol === 'Empleado' || req.data.rol === 'Admin') {
-        const { usuario, contrasenia } = req.body;
-        mysqlConnecction.query('call spNuevoUsuarioEmpleado(?, ?)', [usuario, contrasenia],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "mensaje": "Usuario creado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al crear usuario"
-                    });
-                }
-            });
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+router.post('/nuevoUsuarioEmpleado',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isAdmin], (req, res) => {
+
+    const { usuario, contrasenia } = req.body;
+    mysqlConnecction.query('call spNuevoUsuarioEmpleado(?, ?)', [usuario, contrasenia],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "mensaje": "Usuario creado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al crear usuario"
+                });
+            }
+        });
 });
-router.delete('/:id', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
-    if (req.data.id == req.params['id'] || req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
-        mysqlConnecction.query('call spDarDeBajaUsuario(?,@status); select @status as status;', [req.params['id']],
-            (err, rows, fields) => {
-                if (!err) {
-                    const status = rows[1][0].status;
-                    if (status == 1) {
-                        res.status(200).json({
-                            "ok": true,
-                            "mensaje": "Usuario dado de baja con éxito"
-                        });
-                    } else if (status == 0) {
-                        res.status(404).json({
-                            "ok": false,
-                            "mensaje": "Error al dar de baja usuario"
-                        });
-                    }
 
-                } else {
-                    console.log(err);
-                    res.status(500).json({
+router.delete('/:id',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isAdmin], (req, res) => {
+
+    mysqlConnecction.query('call spDarDeBajaUsuario(?,@status); select @status as status;', [req.params['id']],
+        (err, rows, fields) => {
+            if (!err) {
+                const status = rows[1][0].status;
+                if (status == 1) {
+                    res.status(200).json({
+                        "ok": true,
+                        "mensaje": "Usuario dado de baja con éxito"
+                    });
+                } else if (status == 0) {
+                    res.status(404).json({
                         "ok": false,
                         "mensaje": "Error al dar de baja usuario"
                     });
                 }
 
-            })
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al dar de baja usuario"
+                });
+            }
+
+        })
 });
 module.exports = router;

@@ -8,8 +8,11 @@ const mysqlConnecction = require('../connection/connection');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-
-router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
+// Este inclye las no vigentes
+router.get('/',
+    [authJwt.verifyToken, 
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee], (req, res) => {
     mysqlConnecction.query('call spObtenerPromociones();',
         (err, rows, fields) => {
             if (!err) {
@@ -21,7 +24,9 @@ router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => 
             }
         })
 });
-router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
+
+router.get('/detalles/:id', 
+    (req, res) => {
     mysqlConnecction.query('call spObtenerDetallesPromocion(?);', [req.params['id']],
         (err, rows, fields) => {
             if (!err) {
@@ -33,21 +38,11 @@ router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (r
             }
         })
 });
-router.get('/promociones/vigentes',  (req, res) => {
-    mysqlConnecction.query('call spObtenerPromocionesVigentes();',
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(200).json({ "ok": true, "resultado": rows[0] });
-                console.log(rows);
-            } else {
-                res.status(500).json({ "ok": false, "mensaje": "Error al listar promociones vigentes" })
-                console.log(err);
-            }
-        })
-});
 
-router.post('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], async (req, res) => {
-
+router.post('/',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee], async (req, res) => {
     const { nombre, descripcion, precioPuntos, detalles, fechaDesde, fechaHasta } = req.body;
     await mysqlConnecction.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
     await mysqlConnecction.beginTransaction();

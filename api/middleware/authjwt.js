@@ -43,6 +43,22 @@ isEmployee = async (req, res, next) => {
     }
 };
 
+checkIdUsuario = async (req, res, next) => {
+    if (req.data.id == req.params['id'] || req.data.rol === 'Admin'){
+        return next();
+    } else {
+        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+    }
+};
+
+checkIdUsuarioOrEmployee = async (req, res, next) => {
+    if (req.data.id == req.params['id'] || req.data.rol === 'Admin' || req.data.rol === 'Empleado'){
+        return next();
+    } else {
+        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+    }
+};
+
 checkIdSocio = async (req, res, next) => {
     if (req.data.rol === 'Admin' || req.data.idSocio == req.params['id']){
         return next();
@@ -57,7 +73,9 @@ const authJwt = {
   invalidTokenCheck,
   isAdmin,
   isEmployee,
-  checkIdSocio
+  checkIdUsuario,
+  checkIdSocio,
+  checkIdUsuarioOrEmployee
 };
 
 module.exports = authJwt;
