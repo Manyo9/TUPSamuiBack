@@ -53,7 +53,7 @@ router.delete('/:id',
     authJwt.isEmployee],
     (req, res) => {
 
-    mysqlConnecction.query('call spBorrarGusto(?)', [req.params['id']],
+    mysqlConnecction.query('call spEliminarGusto(?)', [req.params['id']],
         (err, rows, fields) => {
             if (!err) {
                 res.status(200).json({
