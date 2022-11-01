@@ -42,7 +42,9 @@ router.get('/detalles/:id',
 router.post('/',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
-    authJwt.isEmployee], async (req, res) => {
+    authJwt.isEmployee],
+    async (req, res) => {
+        
     const { nombre, descripcion, precioPuntos, detalles, fechaDesde, fechaHasta } = req.body;
     await mysqlConnecction.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
     await mysqlConnecction.beginTransaction();

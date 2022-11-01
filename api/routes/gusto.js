@@ -21,82 +21,76 @@ router.get('/',(req,res)=>{
         }
     })
 });
-router.post('/', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
-    if (req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
-        const { nombre, activo } = req.body;
-        mysqlConnecction.query('call spCrearGusto(?,?)', [nombre,activo],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "mensaje": "Gusto creado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al crear gusto"
-                    });
-                }
-            });
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+
+router.post('/', 
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee],
+
+    (req, res) => {
+
+    const { nombre, activo } = req.body;
+    mysqlConnecction.query('call spCrearGusto(?,?)', [nombre,activo],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "mensaje": "Gusto creado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al crear gusto"
+                });
+            }
+        });
 });
 
-router.delete('/:id', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
-    if (req.data.rol === 'Admin' || req.data.rol === 'Empleado' ) {
-        mysqlConnecction.query('call spBorrarGusto(?)', [req.params['id']],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(200).json({
-                        "ok": true,
-                        "mensaje": "Gusto eliminado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al eliminar gusto"
-                    });
-                }
-            });
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+router.delete('/:id',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee],
+    (req, res) => {
+
+    mysqlConnecction.query('call spBorrarGusto(?)', [req.params['id']],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({
+                    "ok": true,
+                    "mensaje": "Gusto eliminado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al eliminar gusto"
+                });
+            }
+        });
 });
-router.put('/', authJwt.verifyToken, (req, res) => {
-    if (!req.data) {
-        res.status(401).json({ "ok": false, "mensaje": "Token inválido." });
-        return;
-    }
-    if (req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
-        const { activo, nombre, id} = req.body;
-        mysqlConnecction.query('call spActualizarGusto(?,?,?)', [activo, nombre, id],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "mensaje": "Gusto actualizado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al actualizar gusto"
-                    });
-                }
-            });
-    } else {
-        res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-    }
+
+router.put('/', 
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee],
+    (req, res) => {
+
+    const { activo, nombre, id} = req.body;
+    mysqlConnecction.query('call spActualizarGusto(?,?,?)', [activo, nombre, id],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "mensaje": "Gusto actualizado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al actualizar gusto"
+                });
+            }
+        });
 });
 module.exports = router

@@ -84,7 +84,10 @@ router.post('/', [authJwt.verifyToken, authJwt.invalidTokenCheck], async (req, r
         });
 });
 
-router.delete('/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
+router.delete('/:id',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck],
+    (req, res) => {
 
     mysqlConnecction.query('select idSocio from pedidos where id = ?;', [req.params['id']],
         (err, rows, fields) => {
@@ -113,7 +116,12 @@ router.delete('/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, re
         })
 
 });
-router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], (req, res) => {
+
+router.get('/',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee],
+    (req, res) => {
 
     mysqlConnecction.query('call spObtenerPedidos();',
         (err, rows, fields) => {
@@ -126,7 +134,13 @@ router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmplo
             }
         })
 });
-router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (req, res) => {
+
+// Chequear que sea pedido propio?
+router.get('/detalles/:id',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck],
+    (req, res) => {
+
     mysqlConnecction.query('call spObtenerDetalles(?);', [req.params['id']],
         (err, rows, fields) => {
             if (!err) {
@@ -138,4 +152,5 @@ router.get('/detalles/:id', [authJwt.verifyToken, authJwt.invalidTokenCheck], (r
             }
         })
 });
+
 module.exports = router
