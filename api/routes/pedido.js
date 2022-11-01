@@ -152,5 +152,21 @@ router.get('/detalles/:id',
             }
         })
 });
+router.get('/pendientes',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee],
+    (req, res) => {
 
+    mysqlConnecction.query('call spObtenerPedidosPendientes();',
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({ "ok": true, "resultado": rows[0] });
+                console.log(rows);
+            } else {
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
+                console.log(err);
+            }
+        })
+});
 module.exports = router
