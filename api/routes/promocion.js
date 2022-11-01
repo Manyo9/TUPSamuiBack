@@ -24,7 +24,6 @@ router.get('/',
             }
         })
 });
-
 router.get('/detalles/:id', 
     (req, res) => {
     mysqlConnecction.query('call spObtenerDetallesPromocion(?);', [req.params['id']],
@@ -101,5 +100,17 @@ router.post('/',
         });
 });
 
+router.get('/vigentes', (req, res) => {
+    mysqlConnecction.query('call spObtenerPromocionesVigentes();',
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(200).json({ "ok": true, "resultado": rows[0] });
+                console.log(rows);
+            } else {
+                res.status(500).json({ "ok": false, "mensaje": "Error al listar promociones" })
+                console.log(err);
+            }
+        })
+});
 
 module.exports = router
