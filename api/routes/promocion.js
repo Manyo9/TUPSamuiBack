@@ -24,6 +24,7 @@ router.get('/',
             }
         })
 });
+
 router.get('/detalles/:id', 
     (req, res) => {
     mysqlConnecction.query('call spObtenerDetallesPromocion(?);', [req.params['id']],
