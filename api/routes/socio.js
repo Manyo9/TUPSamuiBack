@@ -9,7 +9,10 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 
-router.get('/', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], (req, res) => {
+router.get('/', 
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee], (req, res) => {
     mysqlConnecction.query('call spObtenerSocios();',
         (err, rows, fields) => {
             if (!err) {
