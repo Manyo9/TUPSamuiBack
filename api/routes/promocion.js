@@ -145,7 +145,7 @@ router.put('/',
         authJwt.isEmployee
     ],
     (req, res) => {
-        const { id, nombre, descripcion, precioPuntos, fechaDesde, fechaHasta} = req.body;
+        const { id, nombre, descripcion, precioPuntos, fechaDesde, fechaHasta } = req.body;
         mysqlConnecction.query('call spEditarPromocion(?,?,?,?,?,?)', [id, nombre, descripcion, precioPuntos, new Date(fechaDesde), new Date(fechaHasta)],
             (err, rows, fields) => {
                 if (!err) {
@@ -158,6 +158,30 @@ router.put('/',
                     res.status(500).json({
                         "ok": false,
                         "mensaje": "Error al actualizar promocion"
+                    });
+                }
+            });
+    });
+
+router.post('/canjearPuntos',
+    [
+        authJwt.verifyToken,
+        authJwt.invalidTokenCheck
+    ], (req, res) => {
+
+        const { idPromocion, idSocio } = req.body;
+        mysqlConnecction.query('call spCanjearPuntos(?,?)', [idPromocion, idSocio],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "mensaje": "Canje registrado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al registrar canje"
                     });
                 }
             });
