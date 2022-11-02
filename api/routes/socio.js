@@ -135,7 +135,7 @@ router.put('/',
                     res.status(201).json({
                         "ok": true,
                         "resultado": rows[0],
-                        "mensaje": "Reporte socio generado con éxito"
+                        "mensaje": "Reporte socio cantidad de socios nuevos generado con éxito"
                     });
                 } else {
                     console.log(err);
@@ -157,7 +157,28 @@ router.put('/',
                     res.status(201).json({
                         "ok": true,
                         "resultado": rows[0],
-                        "mensaje": "Reporte socio generado con éxito"
+                        "mensaje": "Reporte socio cantidad de bajas generado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al generar reporte socio"
+                    });
+                }
+            });
+    
+    });
+
+    router.post('/pedidos', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
+        const { fechaDesde, fechaHasta } = req.body;
+        mysqlConnecction.query('call spCantPedidosPeriodo(?, ?)', [ fechaDesde, fechaHasta],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "resultado": rows[0],
+                        "mensaje": "Reporte socio cantidad de pedidos generado con éxito"
                     });
                 } else {
                     console.log(err);
