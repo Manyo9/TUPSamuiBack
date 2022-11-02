@@ -114,4 +114,25 @@ router.get('/vigentes', (req, res) => {
         })
 });
 
+router.delete('/:id',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck,
+    authJwt.isEmployee], (req, res) => {
+
+        mysqlConnecction.query('call spTerminarPromocion(?)', [req.params['id']],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({
+                        "ok": true,
+                        "mensaje": "Promoción terminada con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al terminada promoción"
+                    });
+                }
+            });
+    });
 module.exports = router
