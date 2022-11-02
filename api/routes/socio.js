@@ -148,4 +148,26 @@ router.put('/',
     
     });
 
+
+    router.post('/bajas', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
+        const { fechaDesde, fechaHasta } = req.body;
+        mysqlConnecction.query('call spObtenerCantSociosBaja(?, ?)', [ fechaDesde, fechaHasta],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "resultado": rows[0],
+                        "mensaje": "Reporte socio generado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al generar reporte socio"
+                    });
+                }
+            });
+    
+    });
+
 module.exports = router
