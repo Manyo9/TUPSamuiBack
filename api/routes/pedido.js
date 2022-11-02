@@ -89,33 +89,33 @@ router.delete('/:id',
     authJwt.invalidTokenCheck],
     (req, res) => {
 
-    mysqlConnecction.query('select idSocio from pedidos where id = ?;', [req.params['id']],
-        (err, rows, fields) => {
-            const idSocio = rows[0].idSocio;
+        mysqlConnecction.query('select idSocio from pedidos where id = ?;', [req.params['id']],
+            (err, rows, fields) => {
+                const idSocio = rows[0].idSocio;
 
-            //   Puede cancelarlo la persona que hizo el pedido o un admin o un empleado
-            if ((req.data.idSocio && req.data.idSocio == idSocio) || req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
-                mysqlConnecction.query('call spCancelarPedido(?)', [req.params['id']],
-                    (err, rows, fields) => {
-                        if (!err) {
-                            res.status(201).json({
-                                "ok": true,
-                                "mensaje": "Pedido cancelado con éxito"
-                            });
-                        } else {
-                            console.log(err);
-                            res.status(500).json({
-                                "ok": false,
-                                "mensaje": "Error al cancelar pedido"
-                            });
-                        }
-                    });
-            } else {
-                res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
-            }
-        })
+                //   Puede cancelarlo la persona que hizo el pedido o un admin o un empleado
+                if ((req.data.idSocio && req.data.idSocio == idSocio) || req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
+                    mysqlConnecction.query('call spCancelarPedido(?)', [req.params['id']],
+                        (err, rows, fields) => {
+                            if (!err) {
+                                res.status(201).json({
+                                    "ok": true,
+                                    "mensaje": "Pedido cancelado con éxito"
+                                });
+                            } else {
+                                console.log(err);
+                                res.status(500).json({
+                                    "ok": false,
+                                    "mensaje": "Error al cancelar pedido"
+                                });
+                            }
+                        });
+                } else {
+                    res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+                }
+            })
 
-});
+    });
 
 router.get('/',
     [authJwt.verifyToken,
@@ -123,17 +123,17 @@ router.get('/',
     authJwt.isEmployee],
     (req, res) => {
 
-    mysqlConnecction.query('call spObtenerPedidos();',
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(200).json({ "ok": true, "resultado": rows[0] });
-                console.log(rows);
-            } else {
-                res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
-                console.log(err);
-            }
-        })
-});
+        mysqlConnecction.query('call spObtenerPedidos();',
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows[0] });
+                    console.log(rows);
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
+                    console.log(err);
+                }
+            })
+    });
 
 // Chequear que sea pedido propio?
 router.get('/detalles/:id',
@@ -141,34 +141,34 @@ router.get('/detalles/:id',
     authJwt.invalidTokenCheck],
     (req, res) => {
 
-    mysqlConnecction.query('call spObtenerDetalles(?);', [req.params['id']],
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(200).json({ "ok": true, "resultado": rows[0] });
-                console.log(rows);
-            } else {
-                res.status(500).json({ "ok": false, "mensaje": "Error al listar detalles de pedido" })
-                console.log(err);
-            }
-        })
-});
+        mysqlConnecction.query('call spObtenerDetalles(?);', [req.params['id']],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows[0] });
+                    console.log(rows);
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar detalles de pedido" })
+                    console.log(err);
+                }
+            })
+    });
 router.get('/pendientes',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
     authJwt.isEmployee],
     (req, res) => {
 
-    mysqlConnecction.query('call spObtenerPedidosPendientes();',
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(200).json({ "ok": true, "resultado": rows[0] });
-                console.log(rows);
-            } else {
-                res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
-                console.log(err);
-            }
-        })
-});
+        mysqlConnecction.query('call spObtenerPedidosPendientes();',
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows[0] });
+                    console.log(rows);
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
+                    console.log(err);
+                }
+            })
+    });
 router.put('/estado',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
@@ -176,7 +176,7 @@ router.put('/estado',
     (req, res) => {
 
         const { idEstado, idPedido } = req.body;
-        mysqlConnecction.query('call spActualizarEstadoPedido(?,?)', [idEstado,idPedido],
+        mysqlConnecction.query('call spActualizarEstadoPedido(?,?)', [idEstado, idPedido],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
@@ -191,5 +191,46 @@ router.put('/estado',
                     });
                 }
             });
-});
+    });
+
+router.get('/propios',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck],
+    (req, res) => {
+        if (!req.data.idSocio) {
+            res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+            return;
+        }
+        mysqlConnecction.query('call spObtenerMisPedidos(?);',
+            [req.data.idSocio],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows[0] });
+                    console.log(rows);
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
+                    console.log(err);
+                }
+            })
+    });
+
+router.get('/:id',
+    [
+        authJwt.verifyToken,
+        authJwt.invalidTokenCheck,
+        authJwt.isEmployee
+    ],
+    (req, res) => {
+
+        mysqlConnecction.query('call spObtenerPedidoPorId(?);', [req.params['id']],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows[0] });
+                    console.log(rows);
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
+                    console.log(err);
+                }
+            })
+    });
 module.exports = router
