@@ -129,7 +129,7 @@ router.put('/',
 
     router.post('/nuevos', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
         const { fechaDesde, fechaHasta } = req.body;
-        mysqlConnecction.query('call spObtenerCantSociosNuevos(?, ?)', [ fechaDesde, fechaHasta],
+        mysqlConnecction.query('call spObtenerCantSociosNuevos(?, ?)', [ new Date(fechaDesde), new Date(fechaHasta)],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
@@ -151,7 +151,7 @@ router.put('/',
 
     router.post('/bajas', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
         const { fechaDesde, fechaHasta } = req.body;
-        mysqlConnecction.query('call spObtenerCantSociosBaja(?, ?)', [ fechaDesde, fechaHasta],
+        mysqlConnecction.query('call spObtenerCantSociosBaja(?, ?)', [ new Date(fechaDesde), new Date(fechaHasta)],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
@@ -172,7 +172,7 @@ router.put('/',
 
     router.post('/pedidos', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
         const { fechaDesde, fechaHasta } = req.body;
-        mysqlConnecction.query('call spCantPedidosPeriodo(?, ?)', [ fechaDesde, fechaHasta],
+        mysqlConnecction.query('call spCantPedidosPeriodo(?, ?)', [ new Date(fechaDesde), new Date(fechaHasta)],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
