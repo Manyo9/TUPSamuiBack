@@ -14,7 +14,6 @@ router.get('/',(req,res)=>{
     (err,rows,fields) => {
         if(!err){
             res.status(200).json({"ok":true,"resultado":rows[0]});
-            console.log(rows);
         } else {
             res.status(500).json({"ok":false,"mensaje":"Error al listar pedidos"})
             console.log(err);

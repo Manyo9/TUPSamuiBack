@@ -127,7 +127,6 @@ router.get('/',
             (err, rows, fields) => {
                 if (!err) {
                     res.status(200).json({ "ok": true, "resultado": rows[0] });
-                    console.log(rows);
                 } else {
                     res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
                     console.log(err);
@@ -145,7 +144,6 @@ router.get('/detalles/:id',
             (err, rows, fields) => {
                 if (!err) {
                     res.status(200).json({ "ok": true, "resultado": rows[0] });
-                    console.log(rows);
                 } else {
                     res.status(500).json({ "ok": false, "mensaje": "Error al listar detalles de pedido" })
                     console.log(err);
@@ -157,12 +155,10 @@ router.get('/pendientes',
     authJwt.invalidTokenCheck,
     authJwt.isEmployee],
     (req, res) => {
-
         mysqlConnecction.query('call spObtenerPedidosPendientes();',
             (err, rows, fields) => {
                 if (!err) {
                     res.status(200).json({ "ok": true, "resultado": rows[0] });
-                    console.log(rows);
                 } else {
                     res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
                     console.log(err);
@@ -206,7 +202,6 @@ router.get('/propios',
             (err, rows, fields) => {
                 if (!err) {
                     res.status(200).json({ "ok": true, "resultado": rows[0] });
-                    console.log(rows);
                 } else {
                     res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
                     console.log(err);
@@ -226,7 +221,6 @@ router.get('/:id',
             (err, rows, fields) => {
                 if (!err) {
                     res.status(200).json({ "ok": true, "resultado": rows[0] });
-                    console.log(rows);
                 } else {
                     res.status(500).json({ "ok": false, "mensaje": "Error al listar pedidos" })
                     console.log(err);
