@@ -27,4 +27,7 @@ app.use('/socios',socioRoute);
 const promocionRoute = require('./api/routes/promocion');
 app.use('/promociones',promocionRoute);
 
+const tipoPagoRoute = require('./api/routes/tipoPago');
+app.use('/tiposPago',tipoPagoRoute);
+
 module.exports = app;
