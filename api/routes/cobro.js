@@ -20,7 +20,7 @@ router.post('/',
                 if ((req.data.idSocio && req.data.idSocio == idSocio) || req.data.rol === 'Admin' || req.data.rol === 'Empleado') {
                     mysqlConnecction.query('call spCobrar(?,?,?,?,?)',
                         [
-                            idPedido, tipoPago,
+                            idPedido, tipoPago.id,
                             req.data.idEmpleado ? req.data.idEmpleado : null,
                             codigoAutorizacion, montoCobrado
                         ],
