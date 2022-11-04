@@ -85,8 +85,8 @@ router.put('/',
     authJwt.invalidTokenCheck,
     authJwt.isEmployee],
     (req, res) => {
-        const { id, nombre, precio, descripcion, observaciones, activo, puntosGanados, urlImagen } = req.body;
-        mysqlConnecction.query('call spActualizarProducto(?,?,?,?,?,?,?,?)', [id, nombre, precio, descripcion, observaciones, activo, puntosGanados, urlImagen],
+        const { id, nombre, precio, descripcion, observaciones, activo, disponible,puntosGanados, urlImagen } = req.body;
+        mysqlConnecction.query('call spActualizarProducto(?,?,?,?,?,?,?,?,?)', [id, nombre, precio, descripcion, observaciones, activo, disponible,puntosGanados, urlImagen],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
