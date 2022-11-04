@@ -30,4 +30,7 @@ app.use('/promociones',promocionRoute);
 const tipoPagoRoute = require('./api/routes/tipoPago');
 app.use('/tiposPago',tipoPagoRoute);
 
+const cobroRoute = require('./api/routes/cobro');
+app.use('/cobros',cobroRoute);
+
 module.exports = app;
