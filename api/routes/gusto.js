@@ -89,7 +89,7 @@ router.put('/',
     (req, res) => {
 
     const { activo, nombre, id} = req.body;
-    mysqlConnecction.query('call spActualizarGusto(?,?,?)', [activo, nombre, id],
+    mysqlConnecction.query('call spEditarGusto(?,?,?)', [id, nombre, activo],
         (err, rows, fields) => {
             if (!err) {
                 res.status(201).json({
