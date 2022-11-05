@@ -103,7 +103,6 @@ router.get('/exists',
             res.status(400).json({ "ok": false, "mensaje": "No se recibió el parametro requerido" });
             return;
         }
-        console.log(req.query.dni)
         mysqlConnecction.query('call spObtenerSocioByDNI(?);', req.query.dni,
             (err, rows, fields) => {
                 if (!err) {
