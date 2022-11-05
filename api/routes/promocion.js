@@ -166,9 +166,11 @@ router.post('/canjearPuntos',
         authJwt.verifyToken,
         authJwt.invalidTokenCheck
     ], (req, res) => {
-
-        const { idPromocion, idSocio } = req.body;
-        mysqlConnecction.query('call spCanjearPuntos(?,?)', [idPromocion, idSocio],
+        if (!req.data.idSocio) {
+            res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+            return;
+        }
+        mysqlConnecction.query('call spCanjearPuntos(?,?)', [req.body.id, req.data.idSocio],
             (err, rows, fields) => {
                 if (!err) {
                     res.status(201).json({
