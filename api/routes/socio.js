@@ -74,6 +74,28 @@ router.delete('/:id',
                 }
             })
     });
+router.get('/misPuntos',
+    [authJwt.verifyToken,
+    authJwt.invalidTokenCheck],
+    (req, res) => {
+        if (!req.data.idSocio) {
+            res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
+            return;
+        }
+        mysqlConnecction.query('call spObtenerPuntosDeSocio(?);',
+            [req.data.idSocio],
+            (err, rows, fields) => {
+                if (rows.length < 1) {
+                    res.status(404).json({ "ok": false, "mensaje": "No se encontraron movimientos de puntos para el id especificado" });
+                }
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows[0] });
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al obtener puntos" });
+                    console.log(err);
+                }
+            })
+    });
 
 router.get('/:id',
     [authJwt.verifyToken,
@@ -99,127 +121,96 @@ router.put('/',
     [
         authJwt.verifyToken,
         authJwt.invalidTokenCheck
-    ],    
+    ],
     (req, res) => {
         //Si se quiere que admin y empleado puedan modificar DNI hay que crear otra ruta con otro sp
         if (req.data.rol === 'Admin' || req.data.rol === 'Empleado' || req.params['id'] == req.data.idSocio) {
-        const { id, nombre, apellido, domicilio, email, telefono } = req.body;
-        mysqlConnecction.query('call spModificarSocio(?,?,?,?,?,?)', [ nombre, apellido, domicilio, email, telefono, id],
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(200).json({
-                    "ok": true,
-                    "mensaje": "Socio actualizado con éxito"
+            const { id, nombre, apellido, domicilio, email, telefono } = req.body;
+            mysqlConnecction.query('call spModificarSocio(?,?,?,?,?,?)', [nombre, apellido, domicilio, email, telefono, id],
+                (err, rows, fields) => {
+                    if (!err) {
+                        res.status(200).json({
+                            "ok": true,
+                            "mensaje": "Socio actualizado con éxito"
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            "ok": false,
+                            "mensaje": "Error al actualizar socio"
+                        });
+                    }
                 });
-            } else {
-                console.log(err);
-                res.status(500).json({
-                    "ok": false,
-                    "mensaje": "Error al actualizar socio"
-                });
-            }
-        });
         } else {
             res.status(403).json({ "ok": false, "mensaje": "Usted no tiene los permisos requeridos para acceder a este recurso." });
         }
     });
 
 
-    router.post('/nuevos', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
-        const { fechaDesde, fechaHasta } = req.body;
-        mysqlConnecction.query('call spObtenerCantSociosNuevos(?, ?)', [ new Date(fechaDesde), new Date(fechaHasta)],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "resultado": rows[0],
-                        "mensaje": "Reporte socio cantidad de socios nuevos generado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al generar reporte socio"
-                    });
-                }
-            });
-    
-    });
+router.post('/nuevos', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], (req, res) => {
+    const { fechaDesde, fechaHasta } = req.body;
+    mysqlConnecction.query('call spObtenerCantSociosNuevos(?, ?)', [new Date(fechaDesde), new Date(fechaHasta)],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "resultado": rows[0],
+                    "mensaje": "Reporte socio cantidad de socios nuevos generado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al generar reporte socio"
+                });
+            }
+        });
+
+});
 
 
-    router.post('/bajas', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
-        const { fechaDesde, fechaHasta } = req.body;
-        mysqlConnecction.query('call spObtenerCantSociosBaja(?, ?)', [ new Date(fechaDesde), new Date(fechaHasta)],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "resultado": rows[0],
-                        "mensaje": "Reporte socio cantidad de bajas generado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al generar reporte socio"
-                    });
-                }
-            });
-    
-    });
+router.post('/bajas', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], (req, res) => {
+    const { fechaDesde, fechaHasta } = req.body;
+    mysqlConnecction.query('call spObtenerCantSociosBaja(?, ?)', [new Date(fechaDesde), new Date(fechaHasta)],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "resultado": rows[0],
+                    "mensaje": "Reporte socio cantidad de bajas generado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al generar reporte socio"
+                });
+            }
+        });
 
-    router.post('/pedidos', [authJwt.verifyToken,authJwt.invalidTokenCheck,authJwt.isEmployee],(req, res) => {
-        const { fechaDesde, fechaHasta } = req.body;
-        mysqlConnecction.query('call spCantPedidosPeriodo(?, ?)', [ new Date(fechaDesde), new Date(fechaHasta)],
-            (err, rows, fields) => {
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "resultado": rows[0],
-                        "mensaje": "Reporte socio cantidad de pedidos generado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al generar reporte socio"
-                    });
-                }
-            });
-    
-    });
+});
 
-    router.get('/:id/puntos/', [
-        authJwt.verifyToken,
-        authJwt.invalidTokenCheck,
-        authJwt.checkIdSocio
-    ],(req, res) => {
+router.post('/pedidos', [authJwt.verifyToken, authJwt.invalidTokenCheck, authJwt.isEmployee], (req, res) => {
+    const { fechaDesde, fechaHasta } = req.body;
+    mysqlConnecction.query('call spCantPedidosPeriodo(?, ?)', [new Date(fechaDesde), new Date(fechaHasta)],
+        (err, rows, fields) => {
+            if (!err) {
+                res.status(201).json({
+                    "ok": true,
+                    "resultado": rows[0],
+                    "mensaje": "Reporte socio cantidad de pedidos generado con éxito"
+                });
+            } else {
+                console.log(err);
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al generar reporte socio"
+                });
+            }
+        });
 
-        mysqlConnecction.query('call spObtenerPuntosDeSocio(?)', [req.params['id']],
-            (err, rows, fields) => {
-                if ( rows.length < 1 ) {
-                    res.status(404).json({
-                        "ok": false,
-                        "mensaje": "No se encontraron movimientos de puntos para el id especificado"
-                    });
-                    return;
-                }
-                if (!err) {
-                    res.status(201).json({
-                        "ok": true,
-                        "resultado": rows[0],
-                        "mensaje": "Reporte socio cantidad de pedidos generado con éxito"
-                    });
-                } else {
-                    console.log(err);
-                    res.status(500).json({
-                        "ok": false,
-                        "mensaje": "Error al generar reporte socio"
-                    });
-                }
-            });
-    
-    });
+});
+
 
 
 module.exports = router
