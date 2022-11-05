@@ -74,9 +74,16 @@ router.post('/iniciarSesion', (req, res) => {
 })
 
 router.post('/nuevoUsuarioSocio', (req, res) => {
-    const { usuario, contrasenia } = req.body;
-    mysqlConnecction.query('call spNuevoUsuarioSocio(?, ?)', [usuario, contrasenia],
+    const { usuario, contrasenia, dni } = req.body;
+    mysqlConnecction.query('call spNuevoUsuarioSocio(?, ?, ?)', [usuario, contrasenia, dni],
         (err, rows, fields) => {
+            if (rows.affectedRows < 1) {
+                res.status(400).json({
+                    "ok": false,
+                    "mensaje": "Ya existe un usuario para el socio con el dni especificado"
+                });
+                return;
+            }
             if (!err) {
                 res.status(201).json({
                     "ok": true,
