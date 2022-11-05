@@ -189,4 +189,37 @@ router.put('/',
     
     });
 
+    router.get('/:id/puntos/', [
+        authJwt.verifyToken,
+        authJwt.invalidTokenCheck,
+        authJwt.checkIdSocio
+    ],(req, res) => {
+
+        mysqlConnecction.query('call spObtenerPuntosDeSocio(?)', [req.params['id']],
+            (err, rows, fields) => {
+                if ( rows.length < 1 ) {
+                    res.status(404).json({
+                        "ok": false,
+                        "mensaje": "No se encontraron movimientos de puntos para el id especificado"
+                    });
+                    return;
+                }
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "resultado": rows[0],
+                        "mensaje": "Reporte socio cantidad de pedidos generado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al generar reporte socio"
+                    });
+                }
+            });
+    
+    });
+
+
 module.exports = router
