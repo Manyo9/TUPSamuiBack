@@ -96,6 +96,25 @@ router.get('/misPuntos',
                 }
             })
     });
+//Devuelvo un booleano sin resultado genérico para usar el validador que vimos en dabd
+router.get('/exists',
+    (req, res) => {
+        if (!req.query.dni) {
+            res.status(400).json({ "ok": false, "mensaje": "No se recibió el parametro requerido" });
+            return;
+        }
+        console.log(req.query.dni)
+        mysqlConnecction.query('call spObtenerSocioByDNI(?);', req.query.dni,
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json(rows[0].length > 0);
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar socios" })
+                    console.log(err);
+                }
+            })
+
+    });
 
 router.get('/:id',
     [authJwt.verifyToken,
