@@ -46,7 +46,8 @@ router.post('/',
         const { nombre, descripcion, precioPuntos, detalles, fechaDesde, fechaHasta } = req.body;
         await mysqlConnecction.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
         await mysqlConnecction.beginTransaction();
-        mysqlConnecction.query('call spRegistrarPromocion(?,?,?,?,?,@id); select @id as id;', [nombre, descripcion, precioPuntos, fechaDesde, fechaHasta],
+        mysqlConnecction.query('call spRegistrarPromocion(?,?,?,?,?,@id); select @id as id;',
+            [nombre, descripcion, precioPuntos, new Date(fechaDesde), new Date(fechaHasta)],
             async (err, rows, fields) => {
                 if (!err) {
                     const idPromocion = rows[1][0].id;
