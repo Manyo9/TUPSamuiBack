@@ -15,7 +15,20 @@ router.get('/',(req,res)=>{
         if(!err){
             res.status(200).json({"ok":true,"resultado":rows[0]});
         } else {
-            res.status(500).json({"ok":false,"mensaje":"Error al listar pedidos"})
+            res.status(500).json({"ok":false,"mensaje":"Error al listar gustos"})
+            console.log(err);
+        }
+    })
+});
+
+router.get('/:id',(req,res)=>{
+    mysqlConnecction.query('call spObtenerGustoPorId(?);',
+    [req.params['id']],
+    (err,rows,fields) => {
+        if(!err){
+            res.status(200).json({"ok":true,"resultado":rows[0]});
+        } else {
+            res.status(500).json({"ok":false,"mensaje":"Error al obtener gusto"})
             console.log(err);
         }
     })
