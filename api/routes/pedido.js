@@ -83,7 +83,63 @@ router.post('/', [authJwt.verifyToken, authJwt.invalidTokenCheck], async (req, r
             }
         });
 });
+router.post('/sinLogin', async (req, res) => {
+    idPuntoVenta = 2;
+    const { detalles, observaciones } = req.body;
+    await mysqlConnecction.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+    await mysqlConnecction.beginTransaction();
+    mysqlConnecction.query('call spRegistrarPedido(?,?,?,?,@id); select @id as id;', [idPuntoVenta, null, null, observaciones],
+        async (err, rows, fields) => {
+            if (!err) {
+                const idPedido = rows[1][0].id;
 
+                try {
+                    for (const detalle of detalles) {
+                        const { producto, cantidad, precioUnitario, puntosGanados, comentarios } = detalle;
+                        mysqlConnecction.query('call spRegistrarDetallePedido(?,?,?,?,?,?);', [idPedido, producto.id, cantidad, precioUnitario, puntosGanados, comentarios],
+                            async (err, rows, fields) => {
+                                if (err) {
+                                    console.error(err);
+                                    console.log("rollback");
+                                    mysqlConnecction.rollback();
+                                    res.status(500).json({
+                                        "ok": false,
+                                        "mensaje": "Error al registrar pedido"
+
+                                    });
+                                    return;
+                                }
+                            });
+                    }
+                    res.status(201).json({
+                        "ok": true,
+                        "mensaje": "Pedido creado con éxito"
+                    });
+                    await mysqlConnecction.commit();
+                }
+                catch (e) {
+                    console.error(e);
+                    console.log("rollback");
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al registrar pedido"
+
+                    });
+                    await mysqlConnecction.rollback();
+                }
+
+            } else {
+                console.log(err);
+                console.log("rollback");
+                mysqlConnecction.rollback();
+                res.status(500).json({
+                    "ok": false,
+                    "mensaje": "Error al registrar pedido"
+
+                });
+            }
+        });
+});
 router.delete('/:id',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck],
