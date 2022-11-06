@@ -7,44 +7,54 @@ const mysqlConnecction = require('../connection/connection');
 
 const jwt = require('jsonwebtoken');
 
-router.get('/', 
+router.get('/',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
-    authJwt.isAdmin] , (req, res) => {
+    authJwt.isAdmin], (req, res) => {
 
-    mysqlConnecction.query('select u.id, r.nombre as rol,' +
-        ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
-        ' join roles r on r.id = u.idRol;',
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(200).json({ "ok": true, "resultado": rows });
-            } else {
-                res.status(500).json({ "ok": false, "mensaje": "Error al listar usuarios" })
-                console.log(err);
-            }
-        })
-});
+        mysqlConnecction.query('select u.id, r.nombre as rol,' +
+            ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
+            ' join roles r on r.id = u.idRol;',
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(200).json({ "ok": true, "resultado": rows });
+                } else {
+                    res.status(500).json({ "ok": false, "mensaje": "Error al listar usuarios" })
+                    console.log(err);
+                }
+            })
+    });
+router.get('/rol',
+    [
+        authJwt.verifyToken,
+        authJwt.invalidTokenCheck
+    ], (req, res) => {
+        res.status(200).json({
+            "ok": true,
+            resultado: [req.data.rol]
+        });
+    });
 
 router.get('/:id',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
     authJwt.checkIdUsuario], (req, res) => {
 
-    mysqlConnecction.query('select u.id, r.nombre as rol,' +
-        ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
-        ' join roles r on r.id = u.idRol where u.id = ?;', [req.params['id']],
-        (err, rows, fields) => {
-            if (!err) {
-                if (rows.length > 0) {
-                    res.status(200).json({ "ok": true, "resultado": rows });
+        mysqlConnecction.query('select u.id, r.nombre as rol,' +
+            ' u.usuario, u.fechaAlta, u.fechaBaja FROM usuarios u' +
+            ' join roles r on r.id = u.idRol where u.id = ?;', [req.params['id']],
+            (err, rows, fields) => {
+                if (!err) {
+                    if (rows.length > 0) {
+                        res.status(200).json({ "ok": true, "resultado": rows });
+                    } else {
+                        res.status(404).json({ "ok": false, "resultado": [] });
+                    }
                 } else {
-                    res.status(404).json({ "ok": false, "resultado": [] });
+                    console.log(err);
                 }
-            } else {
-                console.log(err);
-            }
-    })
-});
+            })
+    });
 
 router.post('/iniciarSesion', (req, res) => {
     const { usuario, contrasenia } = req.body;
@@ -104,76 +114,76 @@ router.post('/nuevoUsuarioAdmin',
     authJwt.invalidTokenCheck,
     authJwt.isAdmin], (req, res) => {
 
-    const { usuario, contrasenia } = req.body;
-    mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)', [usuario, contrasenia],
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(201).json({
-                    "ok": true,
-                    "mensaje": "Usuario creado con éxito"
-                });
-            } else {
-                console.log(err);
-                res.status(500).json({
-                    "ok": false,
-                    "mensaje": "Error al crear usuario"
-                });
-            }
-        });
-});
+        const { usuario, contrasenia } = req.body;
+        mysqlConnecction.query('call spNuevoUsuarioAdmin(?, ?)', [usuario, contrasenia],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "mensaje": "Usuario creado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al crear usuario"
+                    });
+                }
+            });
+    });
 
 router.post('/nuevoUsuarioEmpleado',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
     authJwt.isAdmin], (req, res) => {
 
-    const { usuario, contrasenia } = req.body;
-    mysqlConnecction.query('call spNuevoUsuarioEmpleado(?, ?)', [usuario, contrasenia],
-        (err, rows, fields) => {
-            if (!err) {
-                res.status(201).json({
-                    "ok": true,
-                    "mensaje": "Usuario creado con éxito"
-                });
-            } else {
-                console.log(err);
-                res.status(500).json({
-                    "ok": false,
-                    "mensaje": "Error al crear usuario"
-                });
-            }
-        });
-});
+        const { usuario, contrasenia } = req.body;
+        mysqlConnecction.query('call spNuevoUsuarioEmpleado(?, ?)', [usuario, contrasenia],
+            (err, rows, fields) => {
+                if (!err) {
+                    res.status(201).json({
+                        "ok": true,
+                        "mensaje": "Usuario creado con éxito"
+                    });
+                } else {
+                    console.log(err);
+                    res.status(500).json({
+                        "ok": false,
+                        "mensaje": "Error al crear usuario"
+                    });
+                }
+            });
+    });
 
 router.delete('/:id',
     [authJwt.verifyToken,
     authJwt.invalidTokenCheck,
     authJwt.isAdmin], (req, res) => {
 
-    mysqlConnecction.query('call spDarDeBajaUsuario(?,@status); select @status as status;', [req.params['id']],
-        (err, rows, fields) => {
-            if (!err) {
-                const status = rows[1][0].status;
-                if (status == 1) {
-                    res.status(200).json({
-                        "ok": true,
-                        "mensaje": "Usuario dado de baja con éxito"
-                    });
-                } else if (status == 0) {
-                    res.status(404).json({
+        mysqlConnecction.query('call spDarDeBajaUsuario(?,@status); select @status as status;', [req.params['id']],
+            (err, rows, fields) => {
+                if (!err) {
+                    const status = rows[1][0].status;
+                    if (status == 1) {
+                        res.status(200).json({
+                            "ok": true,
+                            "mensaje": "Usuario dado de baja con éxito"
+                        });
+                    } else if (status == 0) {
+                        res.status(404).json({
+                            "ok": false,
+                            "mensaje": "Error al dar de baja usuario"
+                        });
+                    }
+
+                } else {
+                    console.log(err);
+                    res.status(500).json({
                         "ok": false,
                         "mensaje": "Error al dar de baja usuario"
                     });
                 }
 
-            } else {
-                console.log(err);
-                res.status(500).json({
-                    "ok": false,
-                    "mensaje": "Error al dar de baja usuario"
-                });
-            }
-
-        })
-});
+            })
+    });
 module.exports = router;
